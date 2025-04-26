@@ -1,0 +1,35 @@
+# This file defines standard error responses used across API endpoints
+
+NotFoundError:
+  description: The specified resource was not found
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          error:
+            type: string
+            example: "Resource not found"
+          detail:
+            type: string
+            example: "The requested resource does not exist"
+
+ValidationError:
+  description: Validation error
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          error:
+            type: string
+            example: "Validation error"
+          detail:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                type: string
+            example:
+              city: ["City name is required"]
+              temperature: ["Temperature must be a number"] 

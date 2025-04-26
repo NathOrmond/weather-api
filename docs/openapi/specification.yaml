@@ -1,0 +1,43 @@
+openapi: 3.0.3
+info:
+  title: "Weather API"
+  description: "API for retrieving and managing weather reports"
+  version: "1.0.0"
+  contact:
+    name: "API Support"
+    email: "support@example.com"
+
+tags:
+  - name: weather
+    description: Weather report operations
+
+paths:
+  /weather:
+    $ref: './paths/weather.yaml#/weather'
+  /weather/{city}:
+    $ref: './paths/weather.yaml#/weather_city'
+
+components:
+  schemas:
+    WeatherReport:
+      $ref: './components/schemas/weather.yaml#/WeatherReport'
+    WeatherReportCreate:
+      $ref: './components/schemas/weather.yaml#/WeatherReportCreate'
+    WeatherSummary:
+      $ref: './components/schemas/weather.yaml#/WeatherSummary'
+  
+  # parameters:
+  #   PaginationParams:
+  #     $ref: './components/parameters/pagination.yaml#/PaginationParams'
+  #   LimitParam:
+  #     $ref: './components/parameters/pagination.yaml#/LimitParam'
+  
+  responses:
+    NotFoundError:
+      $ref: './components/responses/error.yaml#/NotFoundError'
+    ValidationError:
+      $ref: './components/responses/error.yaml#/ValidationError'
+  
+  # securitySchemes:
+  #   BearerAuth:
+  #     $ref: './components/security/auth.yaml#/BearerAuth'

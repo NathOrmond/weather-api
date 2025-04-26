@@ -1,0 +1,7 @@
+# This file defines security schemes used across API endpoints
+
+BearerAuth:
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  description: JWT authentication token 

@@ -1,0 +1,92 @@
+WeatherReport:
+  type: object
+  properties:
+    id:
+      type: integer
+      description: The weather report identifier
+      example: 1
+    city:
+      type: string
+      description: The city name
+      example: "London"
+    temperature:
+      type: number
+      format: float
+      description: The temperature in Celsius
+      example: 21.5
+    condition:
+      type: string
+      description: The weather condition
+      example: "Sunny"
+      enum: ["Sunny", "Cloudy", "Rainy", "Snowy", "Windy", "Foggy"]
+    timestamp:
+      type: string
+      format: date-time
+      description: The timestamp of the report
+      example: "2025-04-26T14:30:00Z"
+  required:
+    - city
+    - temperature
+    - condition
+    - timestamp
+
+WeatherReportCreate:
+  type: object
+  properties:
+    city:
+      type: string
+      description: The city name
+      example: "London"
+    temperature:
+      type: number
+      format: float
+      description: The temperature in Celsius
+      example: 21.5
+    condition:
+      type: string
+      description: The weather condition
+      example: "Sunny"
+      enum: ["Sunny", "Cloudy", "Rainy", "Snowy", "Windy", "Foggy"]
+    timestamp:
+      type: string
+      format: date-time
+      description: The timestamp of the report
+      example: "2025-04-26T14:30:00Z"
+  required:
+    - city
+    - temperature
+    - condition
+
+WeatherSummary:
+  type: object
+  properties:
+    cities:
+      type: array
+      items:
+        type: object
+        properties:
+          city:
+            type: string
+            description: The city name
+            example: "London"
+          temperature:
+            type: number
+            format: float
+            description: The latest temperature in Celsius
+            example: 21.5
+          condition:
+            type: string
+            description: The latest weather condition
+            example: "Sunny"
+          timestamp:
+            type: string
+            format: date-time
+            description: The timestamp of the latest report
+            example: "2025-04-26T14:30:00Z"
+        required:
+          - city
+          - temperature
+          - condition
+          - timestamp
+  required:
+    - cities 

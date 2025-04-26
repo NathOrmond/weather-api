@@ -1,0 +1,235 @@
+weather:
+  post:
+    summary: Add a weather report
+    description: Add a new weather report for a city
+    operationId: api.controllers.weather_controller.add_weather_report
+    tags:
+      - weather
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/weather.yaml#/WeatherReportCreate'
+          example:
+            city: "Manchester"
+            temperature: 15.2
+            condition: "Cloudy"
+            timestamp: "2025-04-26T12:00:00Z"
+    x-code-samples:
+      - lang: curl
+        source: |
+          curl -X POST "http://localhost:5000/weather" \
+            -H "Content-Type: application/json" \
+            -d '{"city":"Manchester","temperature":15.2,"condition":"Cloudy","timestamp":"2025-04-26T12:00:00Z"}'
+      - lang: python
+        source: |
+          import requests
+          data = {
+              "city": "Manchester",
+              "temperature": 15.2,
+              "condition": "Cloudy",
+              "timestamp": "2025-04-26T12:00:00Z"
+          }
+          response = requests.post("http://localhost:5000/weather", json=data)
+          print(response.json())
+      - lang: javascript
+        source: |
+          fetch('http://localhost:5000/weather', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              city: "Manchester",
+              temperature: 15.2,
+              condition: "Cloudy",
+              timestamp: "2025-04-26T12:00:00Z"
+            }),
+          })
+          .then(response => response.json())
+          .then(data => console.log(data));
+    responses:
+      '201':
+        description: Weather report added successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/weather.yaml#/WeatherReport'
+            example:
+              id: 1
+              city: "Manchester"
+              temperature: 15.2
+              condition: "Cloudy"
+              timestamp: "2025-04-26T12:00:00Z"
+      '400':
+        $ref: '../components/responses/error.yaml#/ValidationError'
+
+  get:
+    summary: Get all city summaries
+    description: Retrieve a summary of all cities with their latest weather conditions
+    operationId: api.controllers.weather_controller.get_all_city_summaries
+    tags:
+      - weather
+    parameters:
+      - $ref: '../components/parameters/pagination.yaml#/PaginationParams'
+      - $ref: '../components/parameters/pagination.yaml#/LimitParam'
+    x-code-samples:
+      - lang: curl
+        source: |
+          curl -X GET "http://localhost:5000/weather?page=2&limit=10" -H "accept: application/json"
+      - lang: python
+        source: |
+          import requests
+          response = requests.get("http://localhost:5000/weather", params={"page": 2, "limit": 10})
+          print(response.json())
+    responses:
+      '200':
+        description: Summary of all cities
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/weather.yaml#/WeatherSummary'
+            example:
+              cities:
+                - city: "London"
+                  temperature: 18.5
+                  condition: "Cloudy"
+                  timestamp: "2025-04-26T12:00:00Z"
+                - city: "Paris"
+                  temperature: 22.0
+                  condition: "Sunny"
+                  timestamp: "2025-04-26T11:30:00Z"
+                - city: "Manchester"
+                  temperature: 15.2
+                  condition: "Rainy"
+                  timestamp: "2025-04-26T12:15:00Z"
+
+weather_city:
+  get:
+    summary: Get latest weather for a city
+    description: Retrieve the latest weather report for a specific city
+    operationId: api.controllers.weather_controller.get_city_weather
+    tags:
+      - weather
+    parameters:
+      - name: city
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the city
+        example: "London"
+    x-code-samples:
+      - lang: curl
+        source: |
+          curl -X GET "http://localhost:5000/weather/London" -H "accept: application/json"
+      - lang: python
+        source: |
+          import requests
+          response = requests.get("http://localhost:5000/weather/London")
+          print(response.json())
+    responses:
+      '200':
+        description: Latest weather report for the city
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/weather.yaml#/WeatherReport'
+            example:
+              id: 1
+              city: "London"
+              temperature: 18.5
+              condition: "Cloudy"
+              timestamp: "2025-04-26T12:00:00Z"
+      '404':
+        $ref: '../components/responses/error.yaml#/NotFoundError'
+  
+  put:
+    summary: Update weather for a city
+    description: Update the latest weather report for a specific city
+    operationId: api.controllers.weather_controller.update_city_weather
+    tags:
+      - weather
+    parameters:
+      - name: city
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the city
+        example: "London"
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/weather.yaml#/WeatherReportCreate'
+          example:
+            city: "London"
+            temperature: 18.5
+            condition: "Rainy"
+            timestamp: "2025-04-26T15:45:10Z"
+    x-code-samples:
+      - lang: curl
+        source: |
+          curl -X PUT "http://localhost:5000/weather/London" \
+            -H "Content-Type: application/json" \
+            -d '{"city":"London","temperature":18.5,"condition":"Rainy","timestamp":"2025-04-26T15:45:10Z"}'
+      - lang: python
+        source: |
+          import requests
+          data = {
+              "city": "London",
+              "temperature": 18.5,
+              "condition": "Rainy",
+              "timestamp": "2025-04-26T15:45:10Z"
+          }
+          response = requests.put("http://localhost:5000/weather/London", json=data)
+          print(response.json())
+    responses:
+      '200':
+        description: Weather report updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: '../components/schemas/weather.yaml#/WeatherReport'
+            example:
+              id: 1
+              city: "London"
+              temperature: 18.5
+              condition: "Rainy"
+              timestamp: "2025-04-26T15:45:10Z"
+      '404':
+        $ref: '../components/responses/error.yaml#/NotFoundError'
+      '400':
+        $ref: '../components/responses/error.yaml#/ValidationError'
+  
+  delete:
+    summary: Delete all weather reports for a city
+    description: Delete all weather reports for a specific city
+    operationId: api.controllers.weather_controller.delete_city_weather
+    tags:
+      - weather
+    parameters:
+      - name: city
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the city
+        example: "London"
+    x-code-samples:
+      - lang: curl
+        source: |
+          curl -X DELETE "http://localhost:5000/weather/London" -H "accept: application/json"
+      - lang: python
+        source: |
+          import requests
+          response = requests.delete("http://localhost:5000/weather/London")
+          print(response.status_code)
+    responses:
+      '204':
+        description: Weather reports deleted successfully
+      '404':
+        $ref: '../components/responses/error.yaml#/NotFoundError' 
