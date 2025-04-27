@@ -20,7 +20,11 @@ project/
 │   ├── combine_openapi.py  # Utility to combine OpenAPI files
 │   ├── restart_docker-dev.sh # Script to restart development containers
 │   └── debug-docker-dev.sh # Script to view development container logs
-├── tests/                # Tests
+├── tests/
+│   └── integration/      # Integration tests with BATS
+│       ├── helpers.bash      # Helper functions for tests
+│       ├── setup_docker.bash # Docker container setup/teardown
+│       └── weather.bats      # Tests for weather endpoints
 ├── app.py                # Application entry point (development)
 ├── wsgi.py               # WSGI entry point (production)
 ├── Dockerfile            # Docker configuration
@@ -69,6 +73,45 @@ If you encounter issues with the Docker containers:
 # Or manually with Docker Compose
 docker-compose --profile dev logs api
 ```
+
+## Integration Testing
+
+This project includes an integration test suite using BATS to verify the API endpoints against the running Docker container.
+
+### Prerequisites
+
+Before running the tests, ensure you have the following installed locally:
+
+- **Docker & Docker Compose:** To build and run the application container. ([Install Docker](https://docs.docker.com/get-docker/), [Install Docker Compose](https://docs.docker.com/compose/install/))
+- **BATS (Bash Automated Testing System):** The test runner.
+  - Installation (macOS with Homebrew): `brew install bats-core`
+  - Installation (Ubuntu/Debian): `sudo apt-get update && sudo apt-get install bats`
+  - Other methods: See [BATS Installation Guide](https://github.com/bats-core/bats-core#installation)
+- **jq:** A command-line JSON processor used for assertions.
+  - Installation (macOS with Homebrew): `brew install jq`
+  - Installation (Ubuntu/Debian): `sudo apt-get update && sudo apt-get install jq`
+  - Other methods: See [jq Download Guide](https://jqlang.github.io/jq/download/)
+- **curl:** Used to make HTTP requests. Usually pre-installed on Linux/macOS.
+
+### Running the Tests
+
+1. Navigate to the project's root directory in your terminal.
+2. Make sure the necessary dependencies are installed (BATS, jq).
+3. Execute the BATS test suite:
+
+```bash
+# Run all integration tests
+bats tests/integration/
+
+# Or run a specific test file
+bats tests/integration/weather.bats
+```
+
+The test runner will automatically:
+- Start the required Docker containers using the `prod` profile
+- Wait for the API to become available
+- Execute the tests defined in the .bats files
+- Stop and remove the containers when testing is complete
 
 ## Environment Variables
 
