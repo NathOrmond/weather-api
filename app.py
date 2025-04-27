@@ -1,7 +1,7 @@
 # File: app.py
 
 import connexion
-from flask import Flask # Keep Flask import for type hinting if needed
+from flask import Flask, render_template, send_file # Added send_file import
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
@@ -43,6 +43,10 @@ connexion_app = connexion.App(
 )
 
 flask_app = connexion_app.app
+# Set up static folder for docs
+flask_app.static_folder = 'static'
+flask_app.static_url_path = '/static'
+
 # TODO: Add Flask configurations if necessary
 # flask_app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-secret-key')
 
@@ -65,6 +69,21 @@ logger.info("Connexion API specification 'specification.yaml' added.")
 
 register_routes(flask_app)
 logger.info("Custom Flask routes registered.")
+
+# --- Architecture Docs Route ---
+@flask_app.route('/docs/architecture')
+def architecture_docs():
+    """Serves the HTML page displaying architecture diagrams."""
+    # Renders the template located in the 'templates' directory
+    return render_template('architecture.html')
+# --- End Architecture Docs Route ---
+
+# Register the docs directory to be served statically
+@flask_app.route('/docs/<path:path>')
+def serve_docs(path):
+    """Serves files from the docs directory."""
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'docs', path)
+    return send_file(file_path)
 
 # --- Seed Initial Data ---
 # Only seed in development environment
