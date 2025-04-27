@@ -13,6 +13,17 @@ fi
 export API_BASE_URL="http://localhost:5000"
 export HEALTH_CHECK_TIMEOUT=30
 export CHECK_INTERVAL=2
+export VERBOSE=${VERBOSE:-0}  # Add verbose mode flag
+
+# Set verbose mode for debugging
+set_verbose() {
+  if [ "$1" == "true" ] || [ "$1" == "1" ]; then
+    export VERBOSE=1
+    echo -e "${BLUE}[DEBUG]${NC} Verbose mode enabled"
+  else
+    export VERBOSE=0
+  fi
+}
 
 wait_for_api() {
   local start_time=$(date +%s)
@@ -66,7 +77,7 @@ setup_docker() {
     echo -e "${YELLOW}[WARNING]${NC} Container already running. Stopping and removing..."
     docker-compose --profile prod down -v --remove-orphans
   fi
-  if ! docker-compose --profile prod up -d api; then
+  if ! docker-compose --profile prod up -d api-prod; then
     echo -e "${RED}[ERROR]${NC} Failed to start Docker container."
     return 1
   fi

@@ -2,6 +2,7 @@ from uuid import UUID, uuid4
 from typing import Dict, List, Optional, TypeVar, Generic
 from copy import deepcopy
 import logging
+from datetime import timezone
 
 # Import domain models
 from api.models.domain import Location, City, Condition, Report, ReportCondition, ConditionType, IntensityLevel, TemperatureUnit
@@ -105,7 +106,21 @@ class InMemoryReportRepository(InMemoryRepository[Report]):
     # Add specific query methods if needed, e.g.:
     def find_by_location_id(self, location_id: UUID, latest_only: bool = False) -> List[Report]:
         reports = [deepcopy(r) for r in self._data.values() if r.location_id == location_id]
-        reports.sort(key=lambda r: r.timestamp, reverse=True)
+        
+        # Make sure timestamps are comparable by ensuring consistent timezone info
+        def get_timestamp_safe(report):
+            # If the timestamp is timezone-aware, use it as is
+            # If it's timezone-naive, assume UTC
+            try:
+                if report.timestamp.tzinfo is None:
+                    return report.timestamp.replace(tzinfo=timezone.utc)
+                return report.timestamp
+            except Exception:
+                # Fallback in case of any issues
+                return report.timestamp
+        
+        # Sort using the safe timestamp access
+        reports.sort(key=lambda r: get_timestamp_safe(r), reverse=True)
         return reports[:1] if latest_only and reports else reports
 
 # Repository for managing ReportCondition relationships

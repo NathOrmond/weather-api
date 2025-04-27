@@ -2,9 +2,10 @@ WeatherReport:
   type: object
   properties:
     id:
-      type: integer
-      description: The weather report identifier
-      example: 1
+      type: string
+      format: uuid
+      description: The weather report identifier (UUID)
+      example: "123e4567-e89b-12d3-a456-426614174000"
     city:
       type: string
       description: The city name

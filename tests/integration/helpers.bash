@@ -53,13 +53,36 @@ make_request() {
   local url="${API_BASE_URL}${endpoint}"
   REQUEST_COUNT=$((REQUEST_COUNT + 1))
   echo -e "\n${BLUE}[REQUEST #$REQUEST_COUNT]${NC} ${CYAN}$method${NC} $url"
+  
+  # Always show full payload in debug mode
   if [ -n "$data" ]; then
     echo -e "${BLUE}[REQUEST BODY]${NC} $data"
+    
+    # Validate JSON if data is provided
+    if [ "$VERBOSE" -eq "1" ]; then
+      echo -e "${BLUE}[DEBUG]${NC} Validating JSON payload..."
+      if ! echo "$data" | jq . > /dev/null 2>&1; then
+        echo -e "${RED}[ERROR]${NC} Invalid JSON payload"
+        echo -e "${YELLOW}[DEBUG]${NC} Raw payload: $(xxd -p <<< "$data")"
+      else
+        echo -e "${GREEN}[DEBUG]${NC} JSON payload is valid"
+        echo -e "${BLUE}[DEBUG]${NC} Formatted JSON:"
+        echo "$data" | jq .
+      fi
+    fi
   fi
+  
   local start_time=$(date +%s.%N)
   local response
+  
   if [ -n "$data" ]; then
     # If data is provided, add it as JSON payload
+    # Ensure data is properly quoted
+    if [ "$VERBOSE" -eq "1" ]; then
+      echo -e "${BLUE}[DEBUG]${NC} Sending data with curl..."
+      echo -e "${BLUE}[DEBUG]${NC} curl -s -X \"$method\" \"$url\" -H \"Content-Type: application/json\" -d '$data' -i"
+    fi
+    
     response=$(curl -s -X "$method" "$url" \
       -H "Content-Type: application/json" \
       -d "$data" \
@@ -68,15 +91,31 @@ make_request() {
     # Otherwise just make a simple request
     response=$(curl -s -X "$method" "$url" -i)
   fi
+  
   local end_time=$(date +%s.%N)
   local time_taken=$(echo "$end_time - $start_time" | bc)
   local status_line=$(echo "$response" | grep -E "^HTTP/[0-9]+\.[0-9]+ [0-9]+" | head -n 1)
   local status=$(echo "$status_line" | grep -oE "[0-9]{3}" | head -n 1)
+  
   if [ -z "$status" ]; then
     echo -e "${RED}[RESPONSE ERROR]${NC} Could not determine HTTP status code"
   else
     echo -e "${BLUE}[RESPONSE]${NC} Status: $status, Time: ${time_taken}s"
   fi
+  
+  # In verbose mode, also show response headers
+  if [ "$VERBOSE" -eq "1" ]; then
+    echo -e "${BLUE}[DEBUG]${NC} Response headers:"
+    echo "$response" | grep -E "^[A-Za-z0-9_-]+:" | head -n 10
+    
+    # Try to parse response body as JSON
+    local body=$(echo "$response" | sed -n '/^{/,$p')
+    if [ -n "$body" ]; then
+      echo -e "${BLUE}[DEBUG]${NC} Response body JSON:"
+      echo "$body" | jq . 2>/dev/null || echo -e "${YELLOW}[DEBUG]${NC} Not valid JSON: $body"
+    fi
+  fi
+  
   echo "$response"
 }
 
@@ -103,12 +142,7 @@ extract_json_field() {
 generate_weather_report() {
   local city="${1:-TestCity}"
   local timestamp="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-  local json='{
-    "city": "'"$city"'",
-    "temperature": 21.5,
-    "condition": "Sunny",
-    "timestamp": "'"$timestamp"'"
-  }'
+  local json='{"city":"'"$city"'","temperature":21.5,"condition":"Sunny","timestamp":"'"$timestamp"'"}'
   echo -e "${BLUE}[GENERATED WEATHER REPORT]${NC} for city: $city"
   echo "$json"
-} 
+}

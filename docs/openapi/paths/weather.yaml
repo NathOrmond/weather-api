@@ -57,7 +57,7 @@ weather:
             schema:
               $ref: '../components/schemas/weather.yaml#/WeatherReport'
             example:
-              id: 1
+              id: "123e4567-e89b-12d3-a456-426614174000"
               city: "Manchester"
               temperature: 15.2
               condition: "Cloudy"
@@ -137,7 +137,7 @@ weather_city:
             schema:
               $ref: '../components/schemas/weather.yaml#/WeatherReport'
             example:
-              id: 1
+              id: "123e4567-e89b-12d3-a456-426614174000"
               city: "London"
               temperature: 18.5
               condition: "Cloudy"
@@ -195,7 +195,7 @@ weather_city:
             schema:
               $ref: '../components/schemas/weather.yaml#/WeatherReport'
             example:
-              id: 1
+              id: "123e4567-e89b-12d3-a456-426614174000"
               city: "London"
               temperature: 18.5
               condition: "Rainy"

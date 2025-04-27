@@ -15,7 +15,9 @@ project/
 │   └── routes/           # Route definitions and handlers
 ├── config/               # Configuration
 ├── docs/
-│   └── openapi/          # OpenAPI specification files
+│   ├── openapi/          # OpenAPI specification files
+│   ├── todo-specs/       # Technical specifications for current and future work
+│   └── warstories/       # Documentation of bugs and their solutions
 ├── scripts/              
 │   ├── combine_openapi.py  # Utility to combine OpenAPI files
 │   ├── restart_docker-dev.sh # Script to restart development containers
@@ -238,6 +240,58 @@ After starting the application:
 
 The home endpoint provides a dynamic listing of all available API endpoints.
 
+## Weather API Features
+
+### Auto-creating Cities
+
+When submitting a weather report for a city that doesn't exist in the system, the API will automatically create the city with default values. This allows users to add reports for any city without first creating the city record.
+
+Example:
+```bash
+curl -X POST "http://localhost:5000/weather" \
+  -H "Content-Type: application/json" \
+  -d '{"city":"Manchester","temperature":21.5,"condition":"Sunny","timestamp":"2023-06-01T14:00:00Z"}'
+```
+
+### UUID-based IDs
+
+The Weather API uses UUID strings for identifying resources rather than sequential integers. This provides globally unique identifiers with no collision risk, improving scalability.
+
+## War Stories Documentation
+
+The project includes a "warstories" documentation section that captures notable bugs, challenges, and their solutions. These documents serve as both historical records and learning resources for developers.
+
+### Current War Stories
+To view these war stories, see the markdown files in the `docs/warstories/` directory.
+
+### Adding New War Stories
+When encountering and resolving significant issues, consider documenting them as a war story. A good war story includes:
+
+1. Clear description of the issue and its symptoms
+2. Root cause analysis
+3. Implemented solution with code examples
+4. Verification steps
+5. Lessons learned
+
+## Technical Specifications
+
+The project includes a `docs/todo-specs/` directory that contains technical specifications for work being done in the repository and features planned for future development. These specs serve multiple purposes:
+
+1. **Documentation for implemented features**: Detailed explanations of how features were implemented and the reasoning behind technical decisions.
+
+2. **Specifications for future work**: Technical requirements and design documents for features that could be implemented by other developers.
+
+3. **Architectural guidelines**: Standards and patterns to follow when extending the application.
+
+Each specification document typically includes:
+- Objectives and requirements
+- Technical implementation details
+- API design considerations
+- Testing requirements
+- Dependencies and interactions with other components
+
+Developers should reference these specifications when implementing new features to ensure consistency with the project's design principles.
+
 ## OpenAPI Specification
 
 The API is defined using a modular OpenAPI 3.0 specification:
@@ -257,6 +311,13 @@ python scripts/combine_openapi.py docs/openapi/specification.yaml -o combined.ya
 # Output as JSON
 python scripts/combine_openapi.py docs/openapi/specification.yaml --json -o combined.json
 ```
+
+## Recent Changes
+
+- Added automatic city creation when submitting weather reports for new cities
+- Fixed timezone handling in datetime comparisons across the application
+- Updated OpenAPI schema to use UUID strings instead of integers for IDs
+- Added comprehensive documentation of bugs and solutions in the warstories directory
 
 ## Troubleshooting
 
