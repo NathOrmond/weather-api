@@ -1,0 +1,2 @@
+- Some kind of infra for built artifacts 
+- Github actions for deployments? 

@@ -19,8 +19,12 @@ project/
 ├── scripts/              
 │   ├── combine_openapi.py  # Utility to combine OpenAPI files
 │   ├── restart_docker-dev.sh # Script to restart development containers
-│   └── debug-docker-dev.sh # Script to view development container logs
+│   ├── debug-docker-dev.sh # Script to view development container logs
+│   └── unit_tests.sh     # Script to run unit tests
 ├── tests/
+│   ├── unit/             # Unit tests
+│   │   ├── repositories/ # Tests for repository layer
+│   │   └── ...           # Other unit test modules
 │   └── integration/      # Integration tests with BATS
 │       ├── helpers.bash      # Helper functions for tests
 │       ├── setup_docker.bash # Docker container setup/teardown
@@ -73,6 +77,83 @@ If you encounter issues with the Docker containers:
 # Or manually with Docker Compose
 docker-compose --profile dev logs api
 ```
+
+## Unit Testing
+
+The project uses `pytest` for unit testing with a modular test structure that mirrors the application's architecture.
+
+### Running Unit Tests
+
+To run all unit tests:
+
+```bash
+# Using the convenience script
+./scripts/unit_tests.sh
+
+# With verbose output
+./scripts/unit_tests.sh -v
+
+# With code coverage report
+./scripts/unit_tests.sh -c
+```
+
+To run tests for a specific module:
+
+```bash
+# Example: Test only the repositories
+./scripts/unit_tests.sh -m repositories
+
+# With verbose output
+./scripts/unit_tests.sh -v -m repositories
+
+# With code coverage
+./scripts/unit_tests.sh -c -m repositories
+```
+
+### Unit Test Architecture
+
+The unit tests follow these principles:
+
+1. **Mirror Package Structure**: Tests are organized to mirror the main application structure.
+   - `tests/unit/repositories/` contains tests for `api/repositories/` code
+   - Each subsequent module should have its own test directory
+
+2. **Independent Tests**: Each test case is independent and doesn't depend on the results of other tests.
+
+3. **Repository Pattern Testing**: Tests for repositories verify both the generic CRUD operations and domain-specific query methods.
+
+4. **Mock External Dependencies**: Tests use unittest.mock to isolate components from their dependencies.
+
+5. **Comprehensive Testing**: Test both successful operations and error cases.
+
+Example structure for a new feature:
+```
+api/
+├── models/
+│   └── new_feature.py      # Data model for feature
+├── repositories/
+│   └── new_feature_repo.py # Repository for feature
+├── services/
+│   └── new_feature_svc.py  # Service for feature
+
+tests/unit/
+├── models/
+│   └── test_new_feature.py
+├── repositories/
+│   └── test_new_feature_repo.py
+├── services/
+│   └── test_new_feature_svc.py
+```
+
+### Custom Test Script
+
+The `scripts/unit_tests.sh` script provides a convenient way to run unit tests with various options:
+
+- `-v, --verbose`: Enables verbose output for detailed test results
+- `-c, --coverage`: Generates a code coverage report in HTML format
+- `-m, --module MODULE`: Specifies a module within the unit tests directory to test
+
+Coverage reports are generated in the `coverage/html/` directory and can be viewed in a web browser.
 
 ## Integration Testing
 

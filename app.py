@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import logging
 import uvicorn
 from api.routes import register_routes
+from api.repositories.seed import seed_data # Import seed function
 
 env = os.environ.get('FLASK_ENV', 'development')
 dotenv_path = f'.env.{env}'
@@ -64,6 +65,14 @@ logger.info("Connexion API specification 'specification.yaml' added.")
 
 register_routes(flask_app)
 logger.info("Custom Flask routes registered.")
+
+# --- Seed Initial Data ---
+# Only seed in development environment
+if env == 'development':
+    seed_data()
+    logger.info("Development data seeded successfully.")
+else:
+    logger.info("Skipping data seeding in non-development environment.")
 
 
 if __name__ == '__main__':
