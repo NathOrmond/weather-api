@@ -1,60 +1,17 @@
-"""
-Routes module for the API.
+# File: api/routes/__init__.py
 
-This module contains all route definitions and handlers for the API endpoints.
-"""
-import os
-from flask import Response, url_for
-from api.docs.templates import REDOC_HTML
+from flask import Flask
 
-
-def register_all_routes(app):
+def register_routes(app: Flask):
     """
-    Register all API routes with the application.
+    Registers all the custom Flask Blueprints defined in the routes module
+    with the main Flask application instance.
+
     Args:
-        app: The Connexion application instance
+        app: The Flask application instance obtained from Connexion.
     """
-    
-    @app.route('/')
-    def home():
-        """Home/health endpoint that also provides information about API docs."""
-        flask_env = os.environ.get('FLASK_ENV', 'development')
-        endpoints = []
-        for rule in app.app.url_map.iter_rules():
-            endpoint = str(rule.endpoint)
-            path = str(rule.rule)
-            if (endpoint != 'static' and 
-                not endpoint.startswith('_') and 
-                not path.startswith('/static') and
-                not '__debugger__' in path):
-                endpoints.append({
-                    'endpoint': endpoint,
-                    'path': path,
-                    'methods': list(rule.methods - {'HEAD', 'OPTIONS'}) if rule.methods else []
-                })
-        if hasattr(app, 'specification'):
-            api_paths = app.specification.get('paths', {})
-            for path, methods in api_paths.items():
-                for method, details in methods.items():
-                    if method.upper() in {'GET', 'POST', 'PUT', 'DELETE', 'PATCH'}:
-                        endpoints.append({
-                            'endpoint': details.get('operationId', f"{method} {path}"),
-                            'path': path,
-                            'methods': [method.upper()],
-                            'description': details.get('summary', '')
-                        })
-        endpoints.sort(key=lambda x: x['path'])
-        return {
-            'health': 'OK',
-            'environment': flask_env,
-            'docs': {
-                'redoc': '/docs',
-                'swagger': '/ui'
-            },
-            'endpoints': endpoints
-        }
-    
-    @app.route('/docs')
-    def redoc_ui():
-        """Serve the ReDoc UI documentation."""
-        return Response(REDOC_HTML, mimetype='text/html') 
+    from .main import main_bp  
+
+    # Register the imported blueprint(s) with the Flask app
+    # You can add url_prefix if desired, e.g., app.register_blueprint(main_bp, url_prefix='/custom')
+    app.register_blueprint(main_bp)
