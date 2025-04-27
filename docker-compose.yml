@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    image: weather-api:latest
+    container_name: weather-api-container
+    restart: on-failure
+
+    # Configuration for development profile
+    profiles: ["dev"]
+    command: python app.py
+    env_file:
+      - .env.development
+    volumes:
+      - .:/app
+    ports:
+      - "127.0.0.1:5000:5000"
+
+  # Production configuration as a separate service
+  api-prod:
+    build: .
+    image: weather-api:latest
+    container_name: weather-api-container-prod
+    restart: unless-stopped
+    profiles: ["prod"]
+    env_file:
+      - .env.production
+    ports:
+      - "5000:5000"
+
+# volumes:
+#   postgres_data: 
