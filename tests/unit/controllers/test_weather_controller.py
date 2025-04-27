@@ -29,12 +29,13 @@ class TestWeatherController(unittest.TestCase):
             "id": str(self.report_id),
             "city": "London",
             "temperature": 20.5,
+            "temperature_current": 20.5,  # Both versions may appear in service response
+            "temperature_unit": "celsius",
             "condition": "Sunny",
             "timestamp": "2023-06-01T12:00:00+00:00",
+            "humidity": 65.0,
             "location_id": str(self.location_id),
-            "source": "Test",
-            "temperature_unit": "celsius",
-            "humidity": 65.0
+            "source": "Test"
         }
         
         self.city_summaries = {
@@ -52,7 +53,8 @@ class TestWeatherController(unittest.TestCase):
             "city": "London",
             "temperature": 20.5,
             "condition": "Sunny",
-            "timestamp": "2023-06-01T12:00:00Z"
+            "timestamp": "2023-06-01T12:00:00Z",
+            "humidity": 65.0
         }
         
         self.update_body = {
@@ -89,7 +91,7 @@ class TestWeatherController(unittest.TestCase):
             temperature=20.5,
             timestamp_str="2023-06-01T12:00:00Z",
             condition_name="Sunny",
-            humidity=0.0
+            humidity=65.0
         )
     
     def test_add_weather_report_city_not_found(self):

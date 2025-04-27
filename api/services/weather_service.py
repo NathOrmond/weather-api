@@ -119,7 +119,8 @@ class WeatherService:
                         "city": city.name,
                         "temperature": latest_report.temperature_current,
                         "condition": condition_name,
-                        "timestamp": latest_report.timestamp.isoformat()
+                        "timestamp": latest_report.timestamp.isoformat(),
+                        "humidity": latest_report.humidity
                     }
                     city_summaries.append(city_summary)
             
@@ -218,6 +219,10 @@ class WeatherService:
             # Update temperature if provided
             if "temperature" in updates:
                 latest_report.temperature_current = updates["temperature"]
+            
+            # Update humidity if provided
+            if "humidity" in updates:
+                latest_report.humidity = updates["humidity"]
             
             # Update report in repository
             updated_report = report_repository.update(latest_report)
